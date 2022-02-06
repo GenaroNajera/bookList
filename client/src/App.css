@@ -1,0 +1,26 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  text-align: center;
+}
+
+table, th, td {
+  border: 2px solid black;
+  border-collapse: collapse;
+}
+
+.nav {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.nav h2 {
+  cursor: pointer;
+}
+
+table {
+  width: 100%;
+}
