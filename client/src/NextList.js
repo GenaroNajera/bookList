@@ -1,5 +1,5 @@
 function NextList(props) {
-  const {data, handleFormSubmit} = props;
+  const {data, handleFormSubmit, handleChange, body, setBody, editData, deleteData} = props;
 
   return (
     <>
@@ -16,22 +16,37 @@ function NextList(props) {
               <td>{v.id}</td>
               <td>{v.name}</td>
               <td>{v.description}</td>
-              <td>Edit</td>
-              <td>Remove</td>
+              <td style={{color: 'blue'}} onClick={() => {
+                document.querySelector('#editnext').style.display = 'block';
+                setBody(values => ({...values, nextid: v.id}));
+              }}>Edit</td>
+              <td style={{color: 'red'}} onClick={() => deleteData(v.id)}>Remove</td>
               <td>Move</td>
             </tr>
           )}
         </tbody>
       </table>
 
-      <div className='newDialog' id='newnext'>
+      <div className='dialog' id='newnext'>
         <p className='close' onClick={() => document.querySelector('#newnext').style.display = 'none'}>&times;</p>
 
         <form onSubmit={handleFormSubmit}>
-          <label htmlFor='title'>Title: </label>
-          <input type='text' id='title' name='title' /><br />
-          <label htmlFor='author'>Author: </label>
-          <input type='text' id='author' name='author' /><br />
+          <label htmlFor='nextTitle'>Title: </label>
+          <input type='text' id='nextTitle' name='nextTitle' value={body.nextTitle || ''} onChange={handleChange} /><br />
+          <label htmlFor='nextAuthor'>Author: </label>
+          <input type='text' id='nextAuthor' name='nextAuthor' value={body.nextAuthor || ''} onChange={handleChange} /><br />
+          <input type='submit' value='save' id='btn' />
+        </form>
+      </div>
+
+      <div className='dialog' id='editnext'>
+        <p className='close' onClick={() => document.querySelector('#editnext').style.display = 'none'}>&times;</p>
+
+        <form onSubmit={editData}>
+          <label htmlFor='nextTitle'>Title: </label>
+          <input type='text' id='nextTitle' name='nextTitle' value={body.nextTitle || ''} onChange={handleChange} /><br />
+          <label htmlFor='nextAuthor'>Author: </label>
+          <input type='text' id='nextAuthor' name='nextAuthor' value={body.nextAuthor || ''} onChange={handleChange} /><br />
           <input type='submit' value='save' id='btn' />
         </form>
       </div>

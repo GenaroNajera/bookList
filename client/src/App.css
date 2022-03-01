@@ -7,6 +7,10 @@ body {
   text-align: center;
 }
 
+table {
+  width: 100%;
+}
+
 table, th, td {
   border: 2px solid black;
   border-collapse: collapse;
@@ -21,6 +25,29 @@ table, th, td {
   cursor: pointer;
 }
 
-table {
-  width: 100%;
+#new {
+  border: 2px solid black;
+  display: inline-block;
+  background-color: lightgrey;
+  cursor: pointer;
+}
+
+.dialog {
+  display: none;
+  position: absolute;
+  top: 50px;
+  bottom: 50px;
+  left: 50px;
+  right: 50px;
+  /* border: 3px solid blue; */
+  background-color: blue;
+  color: white;
+  z-index: 1;
+}
+
+.close {
+  float: right;
+  font-size: 2em;
+  margin-right: .25em;
+  cursor: pointer;
 }

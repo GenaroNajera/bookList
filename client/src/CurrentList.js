@@ -1,5 +1,5 @@
 function CurrentList(props) {
-  const {data, handleFormSubmit} = props;
+  const {data, handleFormSubmit, handleChange, body, setBody, editData, deleteData} = props;
 
   return (
     <>
@@ -20,24 +20,41 @@ function CurrentList(props) {
               <td>{v.description}</td>
               <td><input type='date' /></td>
               <td><input type='number' placeholder={v.id} /></td>
-              <td>Edit</td>
-              <td>Remove</td>
+              <td style={{color: 'blue'}} onClick={() => {
+                document.querySelector('#editcurrent').style.display = 'block';
+                setBody(values => ({...values, currentid: v.id}));
+              }}>Edit</td>
+              <td style={{color: 'red'}} onClick={() => deleteData(v.id)}>Remove</td>
               <td>Move</td>
             </tr>
           )}
         </tbody>
       </table>
 
-      <div className='newDialog' id='newcurrent'>
+      <div className='dialog' id='newcurrent'>
         <p className='close' onClick={() => document.querySelector('#newcurrent').style.display = 'none'}>&times;</p>
 
         <form onSubmit={handleFormSubmit}>
-          <label htmlFor='title'>Title: </label>
-          <input type='text' id='title' name='title' /><br />
-          <label htmlFor='author'>Author: </label>
-          <input type='text' id='author' name='author' /><br />
-          <label htmlFor='started'>Date Started: </label>
-          <input type='date' id='started' name='started' /><br />
+          <label htmlFor='currentTitle'>Title: </label>
+          <input type='text' id='currentTitle' name='currentTitle' value={body.currentTitle || ''} onChange={handleChange} /><br />
+          <label htmlFor='currentAuthor'>Author: </label>
+          <input type='text' id='currentAuthor' name='currentAuthor' value={body.currentAuthor || ''} onChange={handleChange} /><br />
+          <label htmlFor='currentStarted'>Date Started: </label>
+          <input type='date' id='currentStarted' name='currentStarted' value={body.currentStarted || ''} onChange={handleChange} /><br />
+          <input type='submit' value='save' id='btn' />
+        </form>
+      </div>
+
+      <div className='dialog' id='editcurrent'>
+        <p className='close' onClick={() => document.querySelector('#editcurrent').style.display = 'none'}>&times;</p>
+
+        <form onSubmit={editData}>
+          <label htmlFor='currentTitle'>Title: </label>
+          <input type='text' id='currentTitle' name='currentTitle' value={body.currentTitle || ''} onChange={handleChange} /><br />
+          <label htmlFor='currentAuthor'>Author: </label>
+          <input type='text' id='currentAuthor' name='currentAuthor' value={body.currentAuthor || ''} onChange={handleChange} /><br />
+          <label htmlFor='currentStarted'>Date Started: </label>
+          <input type='date' id='currentStarted' name='currentStarted' value={body.currentStarted || ''} onChange={handleChange} /><br />
           <input type='submit' value='save' id='btn' />
         </form>
       </div>
