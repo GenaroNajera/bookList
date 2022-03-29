@@ -3,7 +3,7 @@ const router = express.Router();
 const pool = require('../db.js');
 
 router.get('/', (req, res, next) => {
-  pool.query('SELECT * FROM test WHERE id % 2 = 0 ORDER BY id', (err, result) => {
+  pool.query('SELECT * FROM completed ORDER BY id', (err, result) => {
     if(err) return next(err);
 
     res.json(result.rows);
@@ -11,19 +11,19 @@ router.get('/', (req, res, next) => {
 });
 
 router.post('/', (req, res, next) => {
-  const {completedTitle, completedAuthor} = req.body;
+  const {newTitle, newAuthor, newRating, newStarted, newFinished} = req.body;
 
-  pool.query('INSERT INTO test(name, description) VALUES($1, $2)', [completedTitle, completedAuthor], (err, result) => {
+  pool.query('INSERT INTO completed(title, author, rating, start_date, finish_date) VALUES($1, $2, $3, $4, $5)', [newTitle, newAuthor, newRating, newStarted, newFinished], (err, result) => {
     if(err) return next(err);
 
     res.sendStatus(200);
   });
 });
 
-router.put('/', (req, res, next) => {
-  const {completedid, completedTitle, completedAuthor} = req.body;
+router.put('/:id', (req, res, next) => {
+  const {editTitle, editAuthor, editRating, editStarted, editFinished} = req.body;
 
-  pool.query('UPDATE test SET name=$1, description=$2 WHERE id=$3', [completedTitle, completedAuthor, completedid], (err, result) => {
+  pool.query('UPDATE completed SET title=$1, author=$2, rating=$3, start_date=$4, finish_date=$5 WHERE id=$6', [editTitle, editAuthor, editRating, editStarted, editFinished, req.params.id], (err, result) => {
     if(err) return next(err);
 
     res.sendStatus(200);
@@ -31,7 +31,7 @@ router.put('/', (req, res, next) => {
 });
 
 router.delete('/:id', (req, res, next) => {
-  pool.query('DELETE FROM test WHERE id=$1', [req.params.id], (err, result) => {
+  pool.query('DELETE FROM completed WHERE id=$1', [req.params.id], (err, result) => {
     if(err) return next(err);
 
     res.sendStatus(200);

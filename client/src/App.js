@@ -7,17 +7,11 @@ import './App.css';
 function App() {
   const [data, setData] = useState([]);
   const [list, setList] = useState('current'); // to know which list to display (current, completed, or next)
-  const [body, setBody] = useState({}); // information for POST and PUT methods
-
-  useEffect(() => {
-    getData(list);
-  },[]);
 
   function getData(route) {
     fetch(`http://localhost:5000/${route}`)
     .then(res => res.json())
     .then(data => {
-      // console.log(data);
       setData(data);
       setList(route);
     })
@@ -26,44 +20,59 @@ function App() {
     });
   }
 
-  function editData(e) {
-    e.preventDefault();
-
-    fetch(`http://localhost:5000/${list}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(body)
-    });
-
-    document.querySelector(`#edit${list}`).style.display = 'none';
-  }
-
-  function handleFormSubmit(e) {
-    e.preventDefault();
+  function postData(body) {
     fetch(`http://localhost:5000/${list}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(body)
+    })
+    .then(() => {
+      getData(list);
+    })
+    .catch(err => {
+      console.error(err);
     });
+  }
 
-    document.querySelector(`#new${list}`).style.display = 'none';
+  function putData(body, id) {
+    fetch(`http://localhost:5000/${list}/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    })
+    .then(() => {
+      getData(list);
+    })
+    .catch(err => {
+      console.error(err);
+    });
   }
 
   function deleteData(id) {
     fetch(`http://localhost:5000/${list}/${id}`, {
       method: 'DELETE'
+    })
+    .then(() => {
+      getData(list);
+    })
+    .catch(err => {
+      console.error(err);
     });
   }
 
-  function handleChange(e) {
+  function handleChange(e, setBody) {
     const name = e.target.name;
     const value = e.target.value;
     setBody(values => ({...values, [name]: value}));
   }
+
+  useEffect(() => {
+    getData(list);
+  }, []);
 
   return (
     <div className="App">
@@ -75,19 +84,14 @@ function App() {
         <h2 onClick={() => getData('next')}>Next</h2>
       </div>
 
-      <h2 id='new' onClick={() => document.querySelector(`#new${list}`).style.display = 'block'}>New {list} entry</h2> 
-
       <div>
-      {list === 'current' ? <CurrentList data={data} handleFormSubmit={handleFormSubmit} handleChange={handleChange} body={body} setBody={setBody} editData={editData} deleteData={deleteData} />
-        : list === 'completed' ? <CompletedList data={data} handleFormSubmit={handleFormSubmit} handleChange={handleChange} body={body} setBody={setBody} editData={editData} deleteData={deleteData} />
-        : <NextList data={data} handleFormSubmit={handleFormSubmit} handleChange={handleChange} body={body} setBody={setBody} editData={editData} deleteData={deleteData} />}
+        {list === 'current' ?
+          <CurrentList data={data} postData={postData} putData={putData} deleteData={deleteData} handleChange={handleChange} />
+        : list === 'completed' ?
+          <CompletedList data={data} postData={postData} putData={putData} deleteData={deleteData} handleChange={handleChange} />
+        :
+          <NextList data={data} postData={postData} putData={putData} deleteData={deleteData} handleChange={handleChange} />}
       </div>
-
-      {/* <form id='newDialog' style={{display: 'none'}} onSubmit={handleFormSubmit}>
-        <input type='date' id='postDate' name='pdate' value={b.pdate || ""} onChange={handleChange}/>
-        <input id='postInput' maxLength='20' name='pinput' value={b.pinput || ""} onChange={handleChange}/>
-        <input type='submit' value='save' id='btn' />
-      </form> */}
     </div>
   );
 }
