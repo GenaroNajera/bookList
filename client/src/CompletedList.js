@@ -4,6 +4,7 @@ function CompletedList(props) {
   const {data, postData, putData, deleteData, handleChange} = props;
   const [body, setBody] = useState({});
   const [editMode, setEditMode] = useState({enabled: false, rowID: null, colID: null});
+  const [moveToList, setMoveToList] = useState('');
 
   function editCell(e, rowid, colid) {
     const children = e.target.parentElement.parentElement.children;
@@ -25,21 +26,38 @@ function CompletedList(props) {
     setEditMode({enabled: false, rowID: null, colID: null});
   }
 
+  function moveTo(e) {
+    const children = e.target.parentElement.parentElement.children;
+
+    setBody(values => ({
+      ...values,
+      newTitle: children[0].innerText,
+      newAuthor: children[1].innerText,
+      newRating: children[2].innerText,
+      newStarted: children[3].innerText,
+      newFinished: children[4].innerText
+    }));
+
+    setMoveToList(e.target.value);
+  }
+
   return (
     <>
-      <div className='container'>
+      <div className='d-flex justify-content-center'>
         <input
           placeholder='Title'
           name='newTitle'
           onChange={e => handleChange(e, setBody)}
           maxLength='50'
         />
+
         <input
           placeholder='Author'
           name='newAuthor'
           onChange={e => handleChange(e, setBody)}
           maxLength='50'
         />
+
         <select
           name='newRating'
           onChange={e => handleChange(e, setBody)}
@@ -51,12 +69,14 @@ function CompletedList(props) {
           <option value='4'>4</option>
           <option value='5'>5</option>
         </select>
+
         <input
           placeholder='Date Started'
           name='newStarted'
           onChange={e => handleChange(e, setBody)}
           onFocus={e => e.target.type = 'date'}
         />
+
         <input
           placeholder='Date Finished'
           name='newFinished'
@@ -67,19 +87,22 @@ function CompletedList(props) {
         <button type='button' onClick={() => postData(body)}>Save</button>
       </div><br />
 
-      <table>
-        <tbody>
+      <table className='table table-striped table-bordered table-sm text-center'>
+        <thead>
           <tr>
             <th>Title</th>
             <th>Author</th>
             <th>Rating</th>
             <th>Started (YYYY-MM-DD)</th>
             <th>Finished (YYYY-MM-DD)</th>
+            <th colSpan='2'>Actions</th>
           </tr>
+        </thead>
 
+        <tbody>
           {data.map(v =>
             <tr key={v.id}>
-              <td>
+              <td style={{width: '14.28%'}}>
                 {editMode.enabled && editMode.rowID === v.id && editMode.colID === 0 ?
                   <input
                     name='editTitle'
@@ -90,9 +113,11 @@ function CompletedList(props) {
                     autoFocus
                   />
                 :
-                  <span onClick={e => editCell(e, v.id, 0)}>{v.title || '-'}</span>}
+                  <span onClick={e => editCell(e, v.id, 0)}>{v.title || '-'}</span>
+                }
               </td>
-              <td>
+
+              <td style={{width: '14.28%'}}>
                 {editMode.enabled && editMode.rowID === v.id && editMode.colID === 1 ?
                   <input
                     name='editAuthor'
@@ -103,9 +128,11 @@ function CompletedList(props) {
                     autoFocus
                   />
                 :
-                  <span onClick={e => editCell(e, v.id, 1)}>{v.author || '-'}</span>}
+                  <span onClick={e => editCell(e, v.id, 1)}>{v.author || '-'}</span>
+                }
               </td>
-              <td>
+
+              <td style={{width: '14.28%'}}>
                 {editMode.enabled && editMode.rowID === v.id && editMode.colID === 2 ?
                   <select
                     name='editRating'
@@ -122,9 +149,11 @@ function CompletedList(props) {
                     <option value='5'>5</option>
                   </select>
                 :
-                  <span onClick={e => editCell(e, v.id, 2)}>{v.rating || '-'}</span>}
+                  <span onClick={e => editCell(e, v.id, 2)}>{v.rating || '-'}</span>
+                }
               </td>
-              <td>
+
+              <td style={{width: '14.28%'}}>
                 {editMode.enabled && editMode.rowID === v.id && editMode.colID === 3 ?
                   <input
                     type='date'
@@ -135,9 +164,11 @@ function CompletedList(props) {
                     autoFocus
                   />
                 :
-                  <span onClick={e => editCell(e, v.id, 3)}>{v.start_date || '-'}</span>}
+                  <span onClick={e => editCell(e, v.id, 3)}>{v.start_date || '-'}</span>
+                }
               </td>
-              <td>
+
+              <td style={{width: '14.28%'}}>
                 {editMode.enabled && editMode.rowID === v.id && editMode.colID === 4 ?
                   <input
                     type='date'
@@ -148,10 +179,52 @@ function CompletedList(props) {
                     autoFocus
                   />
                 :
-                  <span onClick={e => editCell(e, v.id, 4)}>{v.finish_date || '-'}</span>}
+                  <span onClick={e => editCell(e, v.id, 4)}>{v.finish_date || '-'}</span>
+                }
               </td>
-              <td style={{color: 'red'}} onClick={() => deleteData(v.id)}>Remove</td>
-              <td>Move</td>
+
+              <td style={{width: '14.28%'}}>
+                <button
+                  type='button'
+                  className='btn text-danger'
+                  data-bs-toggle='modal'
+                  data-bs-target={`#modal${v.id}`}
+                >
+                  Remove
+                </button>
+
+                <div className='modal fade' id={`modal${v.id}`}>
+                  <div className='modal-dialog modal-dialog-centered'>
+                    <div className='modal-content'>
+                      <div className='modal-header'>
+                        <h4 className='modal-title'>Remove Entry?</h4>
+                        <button type='button' className='btn-close' data-bs-dismiss='modal'></button>
+                      </div>
+                      <div className='modal-footer'>
+                        <button type='button' className='btn btn-primary' data-bs-dismiss='modal'>Cancel</button>
+                        <button type='button' className='btn btn-danger' data-bs-dismiss='modal' onClick={() => deleteData(v.id)}>Remove</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </td>
+
+              <td style={{width: '14.28%'}}>
+                <select className='form-select form-select-sm w-50 d-inline-block' onChange={e => moveTo(e)}>
+                  <option value='' hidden>Move To</option>
+                  <option value='current'>Current</option>
+                  <option value='next'>Next</option>
+                </select>
+
+                <button type='button' onClick={e => {
+                  if(e.target.parentElement.children[0].value) {
+                    postData(body, moveToList);
+                    deleteData(v.id);
+                  }
+                }}>
+                  Move
+                </button>
+              </td>
             </tr>
           )}
         </tbody>

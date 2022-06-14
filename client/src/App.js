@@ -2,11 +2,10 @@ import { useState, useEffect } from 'react';
 import CurrentList from'./CurrentList.js';
 import CompletedList from'./CompletedList.js';
 import NextList from'./NextList.js';
-import './App.css';
 
 function App() {
   const [data, setData] = useState([]);
-  const [list, setList] = useState('current'); // to know which list to display (current, completed, or next)
+  const [list, setList] = useState('current');
 
   function getData(route) {
     fetch(`http://localhost:5000/${route}`)
@@ -20,8 +19,8 @@ function App() {
     });
   }
 
-  function postData(body) {
-    fetch(`http://localhost:5000/${list}`, {
+  function postData(body, lst = list) {
+    fetch(`http://localhost:5000/${lst}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -70,18 +69,24 @@ function App() {
     setBody(values => ({...values, [name]: value}));
   }
 
+  function selected(e) {
+    document.querySelectorAll('h3').forEach(v => v.className = '');
+
+    e.target.className = 'text-info text-decoration-underline';
+  }
+
   useEffect(() => {
     getData(list);
   }, []);
 
   return (
     <div className="App">
-      <h1>Book List</h1>
+      <div className='display-2 text-center'>Book List</div>
 
-      <div className='nav'>
-        <h2 onClick={() => getData('completed')}>Completed</h2>
-        <h2 onClick={() => getData('current')}>Current</h2>
-        <h2 onClick={() => getData('next')}>Next</h2>
+      <div className='d-flex justify-content-evenly'>
+        <h3 onClick={e => {getData('completed'); selected(e);}} style={{cursor: 'pointer'}}>Completed</h3>
+        <h3 className='text-info text-decoration-underline' onClick={e => {getData('current'); selected(e);}} style={{cursor: 'pointer'}}>Current</h3>
+        <h3 onClick={e => {getData('next'); selected(e);}} style={{cursor: 'pointer'}}>Next</h3>
       </div>
 
       <div>
@@ -90,7 +95,8 @@ function App() {
         : list === 'completed' ?
           <CompletedList data={data} postData={postData} putData={putData} deleteData={deleteData} handleChange={handleChange} />
         :
-          <NextList data={data} postData={postData} putData={putData} deleteData={deleteData} handleChange={handleChange} />}
+          <NextList data={data} postData={postData} putData={putData} deleteData={deleteData} handleChange={handleChange} />
+        }
       </div>
     </div>
   );
